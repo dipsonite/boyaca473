@@ -20,7 +20,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 @Configuration
-@PropertySource("file:C:\\Users\\martin.depetris\\git\\boyaca473\\boyaca\\config\\app-dev.properties")
+@PropertySource("classpath:app-dev.properties")
 public class DatabaseConfig {
 	
 	@Autowired
