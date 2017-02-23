@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService);
 	}
-
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			loginProcessingUrl("/loginFormAction").
 			usernameParameter("username").
 			passwordParameter("password").
-			defaultSuccessUrl("/hello", true).
+			defaultSuccessUrl("/calendar", true).
 			permitAll().
 		and()
 			.logout().permitAll();

@@ -30,46 +30,41 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
 
 	@Override
 	public Reserva retrieve(Integer id) {
-		return null;
+		return this.entityManager.find(Reserva.class, id);
 	}
 
 	@Override
 	public Reserva update(Reserva entity) {
-		return null;
+		return this.entityManager.merge(entity);
 	}
 
 	@Override
 	public void delete(Integer id) {
-		
+		this.entityManager.remove(this.retrieve(id));
 	}
 
 	public List<Reserva> getReservas(ReservaCriteria criteria) {
-		
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Reserva> query = cb.createQuery(Reserva.class);
-        Root<Reserva> person = query.from(Reserva.class);
-        query.select(person);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reserva> query = builder.createQuery(Reserva.class);
+        Root<Reserva> reserva = query.from(Reserva.class);
+        query.select(reserva);
+        query.where();
         List<Predicate> predicates = new ArrayList<Predicate>();
 
-        if(criteria.getAnio() != null && criteria.getMes() != null) {
-        	
-//            predicates.add(cb.and(cb.like(person.<String>get("name"), "%" + personCriteria.getName() + "%")));
+        if(criteria.getFechaMin() != null) {
+        	Predicate pred = builder.greaterThanOrEqualTo(reserva.get("fecha"), criteria.getFechaMin());
+			predicates.add(pred);
         }
 
-//        if(personCriteria.getMinAge() != null) {
-//            predicates.add(cb.and(cb.ge(person.<Integer>get("age"), personCriteria.getMinAge())));
-//        }
-//
-//        if(personCriteria.getMaxAge() != null) {
-//            predicates.add(cb.and(cb.le(person.<Integer>get("age"), personCriteria.getMaxAge())));
-//        }
+        if(criteria.getFechaMax() != null) {
+        	Predicate pred = builder.lessThanOrEqualTo(reserva.get("fecha"), criteria.getFechaMax());
+			predicates.add(pred);
+        }
         
         if(!predicates.isEmpty()) {
             query.where(predicates.toArray(new Predicate[predicates.size()]));
         }
-
         TypedQuery<Reserva> typedQuery = entityManager.createQuery(query);
-
         return typedQuery.getResultList();
 	}
 }

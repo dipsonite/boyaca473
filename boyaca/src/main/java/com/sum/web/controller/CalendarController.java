@@ -5,32 +5,24 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.sum.domain.Usuario;
 
 @Controller
-public class HelloController {
+public class CalendarController {
 	
-	private static final Log LOGGER = LogFactory.getLog(HelloController.class);
+	private static final Log LOGGER = LogFactory.getLog(CalendarController.class);
 
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ModelAndView login() {
-		LOGGER.debug("> login() - method = RequestMethod.GET");
-		ModelAndView model = new ModelAndView("login");
-		LOGGER.debug("< login() - method = RequestMethod.GET");
-		return model;
-	}
-
-	@RequestMapping(value = "/hello")
-	public ModelAndView hello() {
-		LOGGER.debug("> hello()");
+	@RequestMapping(value = "/calendar")
+	public ModelAndView calendar() {
+		LOGGER.debug("> calendar()");
 		ModelAndView model = new ModelAndView();
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		model.addObject("uf", usuario.getUnidadFuncional());
+		model.addObject("rol", usuario.getRol());
 		model.setViewName("calendar");
-		LOGGER.debug("< hello()");
+		LOGGER.debug("< calendar()");
 		return model;
 	}
 }

@@ -23,8 +23,25 @@ public class ReservaServiceImpl implements ReservaService {
 	
 	@Transactional(readOnly=true)
 	@Override
-	public List<Reserva> buscarReservasParaMesYAnio(Integer anio, Integer mes) {
-		ReservaCriteria criteria = new ReservaCriteria(anio, mes);
+	public List<Reserva> buscarReservasConCriteria(ReservaCriteria criteria) {
 		return dao.getReservas(criteria);
+	}
+	
+	@Transactional
+	@Override
+	public Reserva crearNuevaReserva(Reserva reserva) {
+		return dao.create(reserva);
+	}
+	
+	@Transactional
+	@Override
+	public void eliminarReserva(Integer id) {
+		dao.delete(id);
+	}
+
+	@Override
+	public Reserva modificarReserva(Reserva reserva) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
