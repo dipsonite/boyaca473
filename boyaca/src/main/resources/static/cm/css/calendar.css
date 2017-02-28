@@ -8,5 +8,6 @@ body {
 #calendar {
 	max-width: 900px;
 	margin: 20px;
+	align: center;
 }
 

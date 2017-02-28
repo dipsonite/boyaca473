@@ -1,67 +1,48 @@
 package com.sum.dao.criteria;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class ReservaCriteria {
 	
-	private Date fechaMax;
-	private Date fechaMin;
-	private Time max;
-	private Time min;
+	private Integer uf;
+	private Timestamp max;
+	private Timestamp min;
+	
+	public ReservaCriteria() {
+		
+	}
 	
 	@JsonCreator
-	public ReservaCriteria(@JsonProperty("fechaMin") Date fechaMin, 
-			@JsonProperty("fechaMax") Date fechaMax) {
-		this.fechaMin = fechaMin;
-		this.fechaMax = fechaMax;
+	public ReservaCriteria(@JsonProperty("min") Timestamp fechaMin, 
+			@JsonProperty("max") Timestamp fechaMax) {
+		this.min = fechaMin;
+		this.max = fechaMax;
 	}
 
-//	@JsonCreator
-//	public ReservaCriteria(@JsonProperty("start") Time min, 
-//			@JsonProperty("end") Time max) {
-//		this.min = min;
-//		this.max = max;
-//	}
-	
-	public ReservaCriteria(Time min, Time max) {
-		this.min = min;
-		this.max = max;
+	public Integer getUf() {
+		return uf;
 	}
 
-	public Date getFechaMax() {
-		return fechaMax;
+	public void setUf(Integer uf) {
+		this.uf = uf;
 	}
 
-	public void setFechaMax(Date fechaMax) {
-		this.fechaMax = fechaMax;
-	}
-
-	public Date getFechaMin() {
-		return fechaMin;
-	}
-
-	public void setFechaMin(Date fechaMin) {
-		this.fechaMin = fechaMin;
-	}
-
-	public Time getMax() {
+	public Timestamp getMax() {
 		return max;
 	}
 
-	public void setMax(Time max) {
+	public void setMax(Timestamp max) {
 		this.max = max;
 	}
 
-	public Time getMin() {
+	public Timestamp getMin() {
 		return min;
 	}
 
-	public void setMin(Time min) {
+	public void setMin(Timestamp min) {
 		this.min = min;
 	}
 }

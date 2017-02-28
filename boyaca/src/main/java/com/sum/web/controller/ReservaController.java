@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sum.dao.criteria.ReservaCriteria;
 import com.sum.domain.Reserva;
+import com.sum.exceptions.ReservaInvalidaException;
 import com.sum.service.ReservaService;
 import com.sum.web.dto.ReservaDTO;
 import com.sum.web.dto.ReservaTranslator;
@@ -34,9 +35,10 @@ public class ReservaController {
 	
 	@RequestMapping(path="/crear", consumes="application/json", method=RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<ReservaDTO> crearReserva(@RequestBody ReservaDTO dto) {
+	public ResponseEntity<ReservaDTO> crearReserva(@RequestBody ReservaDTO dto) throws ReservaInvalidaException {
 		LOGGER.debug("> crearReserva");
-		reservaService.crearNuevaReserva(ReservaTranslator.translate(dto));
+		Reserva nuevaReserva = reservaService.crearNuevaReserva(ReservaTranslator.translate(dto));
+		dto.setId(nuevaReserva.getId());
 		return new ResponseEntity<ReservaDTO>(dto, HttpStatus.CREATED);
 	}
 	
@@ -55,8 +57,9 @@ public class ReservaController {
 	
 	@RequestMapping(path="/modificar", method=RequestMethod.PUT, consumes="application/json")
 	@ResponseBody
-	public ResponseEntity<ReservaDTO> actualizarReserva(@RequestBody ReservaDTO dto) {
-		return new ResponseEntity<ReservaDTO>(HttpStatus.ACCEPTED);
+	public ResponseEntity<ReservaDTO> actualizarReserva(@RequestBody ReservaDTO dto) throws ReservaInvalidaException {
+		Reserva reserva = reservaService.modificarReserva(this.reservaService.buscarReservaPorId(dto.getId()), dto);
+		return new ResponseEntity<ReservaDTO>(ReservaTranslator.getReservaDTO(reserva), HttpStatus.ACCEPTED);
 	}
 	
 	@RequestMapping(path="/eliminar/{id}", method=RequestMethod.DELETE)

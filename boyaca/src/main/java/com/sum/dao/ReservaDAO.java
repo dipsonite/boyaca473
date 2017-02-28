@@ -35,6 +35,7 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
 
 	@Override
 	public Reserva update(Reserva entity) {
+		this.retrieve(entity.getId());
 		return this.entityManager.merge(entity);
 	}
 
@@ -43,7 +44,7 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
 		this.entityManager.remove(this.retrieve(id));
 	}
 
-	public List<Reserva> getReservas(ReservaCriteria criteria) {
+	public List<Reserva> getReservasEntreFechas(ReservaCriteria criteria) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Reserva> query = builder.createQuery(Reserva.class);
         Root<Reserva> reserva = query.from(Reserva.class);
@@ -51,13 +52,13 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
         query.where();
         List<Predicate> predicates = new ArrayList<Predicate>();
 
-        if(criteria.getFechaMin() != null) {
-        	Predicate pred = builder.greaterThanOrEqualTo(reserva.get("fecha"), criteria.getFechaMin());
+        if(criteria.getMin() != null) {
+        	Predicate pred = builder.greaterThanOrEqualTo(reserva.get("inicio"), criteria.getMin());
 			predicates.add(pred);
         }
 
-        if(criteria.getFechaMax() != null) {
-        	Predicate pred = builder.lessThanOrEqualTo(reserva.get("fecha"), criteria.getFechaMax());
+        if(criteria.getMax() != null) {
+        	Predicate pred = builder.lessThanOrEqualTo(reserva.get("fin"), criteria.getMax());
 			predicates.add(pred);
         }
         
@@ -67,4 +68,53 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
         TypedQuery<Reserva> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
 	}
+
+	public List<Reserva> getReservasParaUfYFecha(ReservaCriteria criteria) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reserva> query = builder.createQuery(Reserva.class);
+        Root<Reserva> reserva = query.from(Reserva.class);
+        query.select(reserva);
+        query.where();
+        List<Predicate> predicates = new ArrayList<Predicate>();
+
+        if(criteria.getUf() != null) {
+        	Predicate pred = builder.equal(reserva.get("unidadFuncional"), criteria.getUf());
+			predicates.add(pred);
+        }
+
+        if(criteria.getMax() != null) {
+        	Predicate pred = builder.greaterThanOrEqualTo(reserva.get("fin"), criteria.getMax());
+			predicates.add(pred);
+        }
+        
+        if(!predicates.isEmpty()) {
+            query.where(predicates.toArray(new Predicate[predicates.size()]));
+        }
+        TypedQuery<Reserva> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
+	}
+	
+
+	public List<Reserva> getReservasSolapadas(ReservaCriteria criteria) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reserva> query = builder.createQuery(Reserva.class);
+        Root<Reserva> reserva = query.from(Reserva.class);
+        query.select(reserva);
+        query.where();
+        List<Predicate> predicates = new ArrayList<Predicate>();
+        
+        Predicate a = builder.greaterThan(reserva.get("fin"), criteria.getMin());
+        Predicate b = builder.lessThan(reserva.get("fin"), criteria.getMax());
+        Predicate c = builder.greaterThan(reserva.get("inicio"), criteria.getMin());
+        Predicate d = builder.lessThan(reserva.get("inicio"), criteria.getMax());
+        
+		Predicate pred = builder.or(builder.and(a, b), builder.and(c, d));
+    	predicates.add(pred);
+        
+        query.where(predicates.toArray(new Predicate[predicates.size()]));
+        
+        TypedQuery<Reserva> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
+	}
+	
 }

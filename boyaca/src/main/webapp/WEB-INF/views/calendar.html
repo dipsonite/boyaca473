@@ -51,19 +51,22 @@
             <!--/.nav-collapse -->
         </div>
     </nav>
-    <div id='calendar' align="center">
+    
+	
+    <div id='calendar'>
     </div>
     <div id='reglas'></div>
 
     <input type="hidden" id="contextUf" th:value="${uf}" />
     <input type="hidden" id="contextRol" th:value="${rol}" />
-
+	
+	
     <div class="modal fade" id="nuevaReserva" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Nueva Reserva</h4>
+                    <h4 class="modal-title" id="tituloModal"></h4>
                 </div>
                 <div class="modal-body">
                     <div class="datosReserva">
@@ -71,23 +74,21 @@
                         <label>UF: </label>
                         <input required="true" id="ufInput" type="text" class="form-control input-small" placeholder="Ingrese Unidad Funcional..."></input>
                     	<br/>
-               	 		<label>Fecha: </label>
-                        <div class="input-group">
-                            <input required="true" id="fechaReserva" type="date" class="form-control input-small disabled" placeholder="" value="" ></input>
-                        </div>
-                        <br/>
- 	              	    <label>Inicio: </label>
-                        <div class="input-group bootstrap-timepicker timepicker">
-                            <input required="true" id="inicio" type="text" class="form-control input-small" placeholder="Ingrese hora de inicio..."></input>
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                        </div>
-                        <br/>
-                        <label>Fin: </label>
-                        <div class="input-group bootstrap-timepicker timepicker">
-                            <input required="true" id="fin" type="text" class="form-control input-small" placeholder="Ingrese hora de fin..."></input>
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                        </div>
-                        <br/>
+                      	<div class="input-group">					
+							<div class="input-group bootstrap-timepicker timepicker">
+                      			<span id="fechaInicio" class="input-group-addon"></span>
+	                            <input required="true" id="horaInicio" type="text" class="form-control input-small" placeholder="Ingrese hora de inicio..."></input>
+	                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        	</div>
+				  	 	</div>
+				  	 	<br/>
+				  	 	<div class="input-group">							
+							<div class="input-group bootstrap-timepicker timepicker">
+                      			<span id="fechaFin" class="input-group-addon"></span>
+	                            <input required="true" id="horaFin" type="text" class="form-control input-small" placeholder="Ingrese hora de fin..."></input>
+	                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        	</div>
+				  	 	</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -104,9 +105,30 @@
             </div>
         </div>
     </div>
-
-
-
+    
+    
+    
+    <div class="modal fade" id="errorsInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	    <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="tituloErrorModal"></h4>
+                </div>
+                <div class="modal-body">
+                   	<h6 class="modal-title" id="cuerpoErrorModal"></h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">
+				  		<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cerrar
+					</button>
+                </div>
+            </div>
+        </div>
+    
+<!-- 	    <div id="info" role="alert"> -->
+<!-- 			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+<!-- 		</div> -->
+    </div>
 </body>
-
 </html>

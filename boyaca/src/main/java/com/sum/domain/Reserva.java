@@ -1,7 +1,6 @@
 package com.sum.domain;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,22 +21,18 @@ public class Reserva {
     @Column(name = "UF", nullable = false)
     private Integer unidadFuncional;
     
-    @Column(name = "FECHA", nullable = false)
-    private Date fecha;
-    
     @Column(name = "INICIO", nullable = false)
-    private Time inicio;
+    private Timestamp inicio;
     
     @Column(name = "FIN", nullable = false)
-    private Time fin;
+    private Timestamp fin;
     
     public Reserva() {
     
     }
     
-    public Reserva(Integer unidadFuncional, Date fecha, Time inicio, Time fin) {
+    public Reserva(Integer unidadFuncional, Timestamp inicio, Timestamp fin) {
     	this.unidadFuncional = unidadFuncional;
-    	this.fecha = fecha;
     	this.inicio = inicio;
     	this.fin = fin;
     }
@@ -50,15 +45,23 @@ public class Reserva {
     	return unidadFuncional;
     }
     
-    public Date getFecha() {
-    	return fecha;
-    }
-    
-    public Time getInicio() {
+    public void setUnidadFuncional(Integer unidadFuncional) {
+		this.unidadFuncional = unidadFuncional;
+	}
+
+	public Timestamp getInicio() {
     	return inicio;
     }
     
-    public Time getFin() {
+    public void setInicio(Timestamp inicio) {
+		this.inicio = inicio;
+	}
+
+	public Timestamp getFin() {
     	return fin;
     }
+
+	public void setFin(Timestamp fin) {
+		this.fin = fin;
+	}
 }

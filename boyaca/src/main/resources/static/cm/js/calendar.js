@@ -20,7 +20,7 @@ $(document).ready(function() {
         footer: {
             center: 'month,agendaWeek '
         },
-        timezone: 'America/Buenos_Aires',
+        timezone: 'local',
         firstDay: 0,
         fixedWeekCount: false,
         navLinks: false,
@@ -35,10 +35,8 @@ $(document).ready(function() {
                 dataType: 'json',
                 contentType: "application/json",
                 data: JSON.stringify({
-                	fechaMin: toStringDate(start),
-                	fechaMax: toStringDate(end)
-//                	dateMin: new Date(toStringDate(start)).toJSON(),
-//                	dateMax: new Date(toStringDate(end)).toJSON()
+                	min: start,
+                	max: end.add(1,'days')
                 }),
                 success: function(doc) {
                     var events = [];
@@ -46,9 +44,8 @@ $(document).ready(function() {
                         events.push({
                             id: $(this)[0].id,
                             title: $(this)[0].title,
-                            // TODO VERIFICAR ESTA DATO
-                            start: formatDateForCalendar($(this)[0].date, $(this)[0].start),
-                            end: formatDateForCalendar($(this)[0].date, $(this)[0].end)
+                            start: $(this)[0].start,
+                            end: $(this)[0].end
                         });
                     });
                     callback(events);
@@ -82,67 +79,99 @@ $(document).ready(function() {
             }
         },
         dayRender: function(date, cell) {
-            if (moment(date) < moment(today)) {
+        	if (date < moment().utc().startOf('day')) {
                 cell.css('background-color', '#f2f2f2');
             }
         },
         dayClick: function(date, event, view) {
-            if (moment(date) < moment(today)) {
+        	if (date < moment().utc().startOf('day')) {
                 return false;
             } else {
-                loadModal(null, contextUf, toStringDate(date), "18:00", "23:45");
+                loadModal(null, contextUf, date, date);
             }
         },
         eventClick: function(event, jsEvent, view) {
             if (moment(event.start) < moment(today)) {
                 return;
             } else {
-                loadModal(event.id, event.title, toStringDate(event.start), toStringHours(event.start), toStringHours(event.end));
+            	loadModal(event.id, event.title, event.start, event.end);
             }
         }
     });
 
 
-    $('#inicio').timepicker(({
+    $('#horaInicio').timepicker(({
         showSeconds: false,
+        explicitMode: true,
+        disableMousewheel: false,
         showMeridian: false
     }));
 
-    $('#fin').timepicker(({
+    $('#horaFin').timepicker(({
         showSeconds: false,
+        explicitMode: true,
+        disableMousewheel: false,
         showMeridian: false
     }));
+    
+    $('#horaFin').timepicker().on('changeTime.timepicker', function(e) {
+    	var fechaReserva = $('#fechaInicio').text();
+    	var startTime = moment($('#horaInicio').val(), "HH:mm");
+    	var endTime = moment(e.time.value, "HH:mm");
+    	var duration = moment.duration(endTime.diff(startTime));
+    	
+    	if (duration._milliseconds>0) {
+    		$('#fechaFin').text(toStringDate(moment(fechaReserva,'DD/MM/YYYY')));
+    	} else {
+    		$('#fechaFin').text(toStringDate(moment(fechaReserva,'DD/MM/YYYY').add(1,'days')));
+    	}
+      });
 
     $('#submitReserva').click(function() {
 
-        var fecha = $('#fechaReserva').val();
-        var uf = $('#ufInput').val();
-        var inicio = $('#inicio').val();
-        var fin = $('#fin').val();
+    	var idRes = $('#idReserva').val();
+    	var uf = $('#ufInput').val();
+        var fechaInicio = $('#fechaInicio').text();
+        var horaInicio = $('#horaInicio').val();
+        var fechaFin = $('#fechaFin').text();
+        var horaFin = $('#horaFin').val();
 
         var eventData;
         eventData = {
-            id: 'null',
+            id: idRes == '' ? null : idRes,
             title: uf,
-            start: new Date(fecha), //+inicio,
-            end: new Date(fecha) //+fin,
+            start: formatDateForSubmit(fechaInicio, horaInicio).getTime(),
+            end: formatDateForSubmit(fechaFin, horaFin).getTime() 
         };
-
+        
+        var am = eventData.id == null ? 'crear' : 'modificar'
+        
         $.ajax({
-            url: '/reservas/crear',
-            data: JSON.stringify(eventData),
+            url: eventData.id == null ? '/reservas/'+am : '/reservas/'+am,
+    		type: eventData.id == null ? 'POST' : 'PUT',
             contentType: "application/json",
             dataType: 'json',
-            error: function() {
-                $('#info').html('<p>An error has occurred</p>');
+            data: JSON.stringify(eventData),
+            error: function(err) {
+            	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+            	$('#tituloErrorModal').html('<strong>Ups!</strong>');
+            	$('#cuerpoErrorModal').text(err.responseJSON.message);
+            	$('#errorsInfo').modal('show');
             },
             success: function(data) {
-                eventData.id = data.id;
-            },
-            type: 'POST'
+            	eventData = {
+                        id: data.id,
+                        title: data.title,
+                        start: data.start,
+                        end: data.end
+                    };
+            	$('#calendar').fullCalendar('refetchEvents');
+
+            	$('#info').addClass('alert alert-success alert-dismissible');
+                $('#info').html('<strong>Buenísimo!</strong> Tu reserva se ha podido '+am+' correctamente.');
+            }
         });
 
-        $('#calendar').fullCalendar('renderEvent', eventData, true);
         $('#nuevaReserva').modal('hide');
     });
 
@@ -154,25 +183,49 @@ $(document).ready(function() {
             //            contentType: "application/json",
             //            dataType: 'json',
             success: function(data) {
-                alert('Reserva eliminada correctamente.');
+//                alert('Reserva eliminada correctamente.');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('#info').addClass('alert alert-success alert-dismissible');
+                $('#info').html('<strong>Buenísimo!</strong> Tu reserva se ha eliminado correctamente.');
             },
             error: function() {
-                $('#info').html('<p>An error has occurred</p>');
+            	$('#info').addClass('alert alert-danger alert-dismissible');
+                $('#info').html('<strong>ERROR!</strong> Tu reserva no se ha podido eliminar.');
             }
         });
 
         $('#nuevaReserva').modal('hide');
     });
     
-    function loadModal(id, title, fecha, inicio, fin) {
-
+    function loadModal(id, title, inicio, fin) {
+    	
+//    	if (inicio<today) {
+//    		$('#campos').attr('disabled', true);
+//    	} else {
+//    		$('#campos').attr('disabled', false);
+//    	}
+    	
+    	
+    	if (id==null) {
+    		$('#tituloModal').text("Nueva Reserva");
+    	} else {
+    		$('#tituloModal').text("Modificar Reserva");
+    	}
+    	
         $('#idReserva').val(id);
-        $('#ufInput').val(contextUf);
-
+        
+        if (title == null) {
+        	$('#ufInput').val(contextUf);	
+        } else {
+        	$('#ufInput').val(title);
+        }
+        
         if (rol == 'ADMIN' || title == contextUf) {
             $('#eliminarReserva').show(0);
+            $('#submitReserva').show(0);
         } else {
             $('#eliminarReserva').hide(0);
+            $('#submitReserva').hide(0);
         }
 
         if (rol == 'ADMIN') {
@@ -181,20 +234,25 @@ $(document).ready(function() {
             $('#ufInput').addClass('disabled');
         }
 
-        $('#fechaReserva').val(fecha);
-        $('#inicio').val(inicio);
-        $('#fin').val(fin);
-
+        $('#fechaInicio').text(toStringDate(inicio));
+        var hora = toStringHours(inicio);
+        $('#horaInicio').timepicker('setTime',hora);
+        
+        $('#fechaFin').text(toStringDate(fin));
+        hora = toStringHours(fin);
+        $('#horaFin').timepicker('setTime',hora);
+        
         $('#nuevaReserva').modal('show');
     }
     
 
-    function formatDateForCalendar(date, hour) {
-    	var estaFecha = new Date(date);
-    	var hrs = hour.split(':');
-    	estaFecha.setHours(hrs[0]);
-    	estaFecha.setMinutes(hrs[1]);
-    	return estaFecha.toISOString();
+    function formatDateForSubmit(date, hour) {
+    	var dateSplit = date.split('/');
+    	var hrsSplit = hour.split(':');
+    	var finalDate = new Date(dateSplit[2],dateSplit[1]-1,dateSplit[0]);
+    	finalDate.setHours(hrsSplit[0]);
+    	finalDate.setMinutes(hrsSplit[1]);
+    	return finalDate;
     }
 });
 
@@ -224,9 +282,9 @@ function getThisDates() {
 }
 
 function toStringDate(date) {
-	return date.format('YYYY')+ '-' + date.format('MM') + '-' + date.format('DD');
+	return date.format('DD')+'/'+date.format('MM')+'/'+date.format('YYYY') ;
 }
 
 function toStringHours(date) {
-	return date.hour()-3 + ':' + ('0'+date.minutes()).slice(-2);
+	return date.format('HH') + ':' + date.format('mm');
 }
