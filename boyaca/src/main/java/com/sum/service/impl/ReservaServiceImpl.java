@@ -34,11 +34,11 @@ public class ReservaServiceImpl implements ReservaService {
 	@Override
 	public Reserva crearNuevaReserva(Reserva reserva) throws ReservaInvalidaException {
 		
- 		if (ufConReservaActiva(reserva.getUnidadFuncional())) {
+ 		if (ufConReservaActiva(reserva.getUnidadFuncional(), reserva.getId())) {
 			throw new ReservaInvalidaException("La UF ya tiene una reserva activa. No es posible realizar otra reserva.");
 		}
 		
-		if (hayReservaSolapada(reserva.getInicio(), reserva.getFin())) {
+		if (hayReservaSolapada(reserva.getId(), reserva.getInicio(), reserva.getFin())) {
 			throw new ReservaInvalidaException("Esta reserva se solapa con otra. Modifique las fechas de inicio y fin y reintente.");
 		}
 		
@@ -54,7 +54,7 @@ public class ReservaServiceImpl implements ReservaService {
 	@Transactional
 	@Override
 	public Reserva modificarReserva(Reserva reserva, ReservaDTO dto) throws ReservaInvalidaException {
-		if (hayReservaSolapada(dto.getStart(), dto.getEnd())) {
+		if (hayReservaSolapada(reserva.getId(), dto.getStart(), dto.getEnd())) {
 			throw new ReservaInvalidaException("Esta reserva se solapa con otra. Modifique las fechas de inicio y fin y reintente.");
 		}
 		if (!reserva.getUnidadFuncional().equals(dto.getTitle())) {
@@ -75,8 +75,9 @@ public class ReservaServiceImpl implements ReservaService {
 		return dao.retrieve(id);
 	}
 	
-	private boolean ufConReservaActiva(Integer uf) {
+	private boolean ufConReservaActiva(Integer uf, Integer idReserva) {
 		ReservaCriteria criteria = new ReservaCriteria();
+		criteria.setIdReserva(idReserva);
 		criteria.setUf(uf);
 		criteria.setMax(new Timestamp(System.currentTimeMillis()));
 		if (dao.getReservasParaUfYFecha(criteria).isEmpty()) {
@@ -85,8 +86,9 @@ public class ReservaServiceImpl implements ReservaService {
 		return true;
 	}
 	
-	private boolean hayReservaSolapada(Timestamp inicio, Timestamp fin) {
+	private boolean hayReservaSolapada(Integer idReserva, Timestamp inicio, Timestamp fin) {
 		ReservaCriteria criteria = new ReservaCriteria(inicio, fin);
+		criteria.setIdReserva(idReserva);
 		if (dao.getReservasSolapadas(criteria).isEmpty()) {
 			return false;
 		}

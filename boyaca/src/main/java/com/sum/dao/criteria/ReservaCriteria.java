@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ReservaCriteria {
 	
+	private Integer idReserva;
 	private Integer uf;
 	private Timestamp max;
 	private Timestamp min;
@@ -22,6 +23,14 @@ public class ReservaCriteria {
 		this.max = fechaMax;
 	}
 
+	public Integer getIdReserva() {
+		return idReserva;
+	}
+	
+	public void setIdReserva(Integer idReserva) {
+		this.idReserva = idReserva;
+	}
+	
 	public Integer getUf() {
 		return uf;
 	}

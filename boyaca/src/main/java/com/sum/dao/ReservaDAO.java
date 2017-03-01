@@ -102,19 +102,26 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
         query.select(reserva);
         query.where();
         List<Predicate> predicates = new ArrayList<Predicate>();
+        if (criteria.getIdReserva()!= null) {
+        	predicates.add(builder.notEqual(reserva.get("id"), criteria.getIdReserva()));
+        }
         
         Predicate a = builder.greaterThan(reserva.get("fin"), criteria.getMin());
         Predicate b = builder.lessThan(reserva.get("fin"), criteria.getMax());
         Predicate c = builder.greaterThan(reserva.get("inicio"), criteria.getMin());
         Predicate d = builder.lessThan(reserva.get("inicio"), criteria.getMax());
         
-		Predicate pred = builder.or(builder.and(a, b), builder.and(c, d));
-    	predicates.add(pred);
+        Predicate e = builder.lessThanOrEqualTo(reserva.get("inicio"), criteria.getMin());
+        Predicate f = builder.greaterThanOrEqualTo(reserva.get("fin"), criteria.getMax());
+        
+        Predicate g = builder.greaterThanOrEqualTo(reserva.get("inicio"), criteria.getMin());
+        Predicate h = builder.lessThanOrEqualTo(reserva.get("fin"), criteria.getMax());
+        
+        predicates.add(builder.or(builder.or(builder.and(a, b), builder.and(c, d)), builder.and(e, f), builder.and(g, h)));
         
         query.where(predicates.toArray(new Predicate[predicates.size()]));
         
         TypedQuery<Reserva> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
 	}
-	
 }
