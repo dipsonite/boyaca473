@@ -19,7 +19,7 @@ public class CalendarController {
 		LOGGER.debug("> calendar()");
 		ModelAndView model = new ModelAndView();
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		model.addObject("uf", usuario.getUnidadFuncional());
+		model.addObject("uf", usuario.getUsername());
 		model.addObject("rol", usuario.getRol());
 		model.setViewName("calendar");
 		LOGGER.debug("< calendar()");

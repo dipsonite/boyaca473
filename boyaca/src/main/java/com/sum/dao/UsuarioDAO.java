@@ -25,11 +25,11 @@ public class UsuarioDAO implements GenericPersistentDAO<Usuario, String> {
 
 	@Override
 	public Usuario update(Usuario entity) {
-		return null;
+		this.retrieve(entity.getUsername());
+		return this.entityManager.merge(entity);
 	}
 
 	@Override
 	public void delete(String id) {
-		
 	}
 }

@@ -33,7 +33,6 @@ public class DatabaseConfig {
 	
 	@Bean
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-		System.out.println("> entityManagerFactory");
 		HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
 		adapter.setDatabase(Database.MYSQL);
 		adapter.setShowSql(Boolean.getBoolean(env.getProperty("hibernate.show_sql")));
@@ -48,7 +47,6 @@ public class DatabaseConfig {
 		emfb.setPackagesToScan("com.sum.domain");
 		emfb.setJpaVendorAdapter(adapter);
 		emfb.setJpaProperties(props);
-		System.out.println("< entityManagerFactory");
 		return emfb;
 	}
 	

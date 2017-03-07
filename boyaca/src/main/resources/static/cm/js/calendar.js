@@ -1,5 +1,8 @@
 $(document).ready(function() {
-
+	
+	$("#misForms").children().hide();
+	$("#calendar").show();
+	
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('X-CSRF-TOKEN', $("meta[name='_csrf']").attr("content"));
@@ -13,12 +16,9 @@ $(document).ready(function() {
 
     $('#calendar').fullCalendar({
         header: {
-            left: 'prev',
-            center: 'title,today',
-            right: 'next'
-        },
-        footer: {
-            center: 'month,agendaWeek '
+            left: 'prev,today,next',
+            center: 'title',
+            right: 'month,agendaWeek '
         },
         timezone: 'local',
         firstDay: 0,
@@ -55,10 +55,7 @@ $(document).ready(function() {
         
         displayEventTime: false,
         eventRender: function(event, element) {
-            //            element.find('.fc-title').before("UF: ")
-            //            	.append("<br/>Desde: ").append(epochToDate(event.start))
-            //            	.append("<br/>Hasta: ").append(epochToDate(event.end));
-
+        	
             element.find('.fc-title').before("UF: ")
                 .append("<br/>").append(epochToDate(event.start))
                 .append(" - ").append(epochToDate(event.end));
@@ -79,12 +76,12 @@ $(document).ready(function() {
             }
         },
         dayRender: function(date, cell) {
-        	if (date < moment().utc().startOf('day')) {
+        	if (date < moment().utc().startOf('day').add('-1','days')) {
                 cell.css('background-color', '#f2f2f2');
             }
         },
         dayClick: function(date, event, view) {
-        	if (date < moment().utc().startOf('day')) {
+        	if (date < moment().utc().startOf('day').add('-1','days')) {
                 return false;
             } else {
                 loadModal(null, contextUf, date, date);
@@ -98,8 +95,7 @@ $(document).ready(function() {
             }
         }
     });
-
-
+    
     $('#horaInicio').timepicker(({
         showSeconds: false,
         explicitMode: true,
@@ -180,10 +176,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/reservas/eliminar/' + $('#idReserva').val(),
             type: 'DELETE',
-            //            contentType: "application/json",
-            //            dataType: 'json',
             success: function(data) {
-//                alert('Reserva eliminada correctamente.');
                 $('#calendar').fullCalendar('refetchEvents');
                 $('#info').addClass('alert alert-success alert-dismissible');
                 $('#info').html('<strong>Buenísimo!</strong> Tu reserva se ha eliminado correctamente.');
@@ -198,13 +191,6 @@ $(document).ready(function() {
     });
     
     function loadModal(id, title, inicio, fin) {
-    	
-//    	if (inicio<today) {
-//    		$('#campos').attr('disabled', true);
-//    	} else {
-//    		$('#campos').attr('disabled', false);
-//    	}
-    	
     	
     	if (id==null) {
     		$('#tituloModal').text("Nueva Reserva");
@@ -221,17 +207,17 @@ $(document).ready(function() {
         }
         
         if (rol == 'ADMIN' || title == contextUf) {
-            $('#eliminarReserva').show(0);
-            $('#submitReserva').show(0);
+            $('#eliminarReserva').show();
+            $('#submitReserva').show();
         } else {
-            $('#eliminarReserva').hide(0);
-            $('#submitReserva').hide(0);
+            $('#eliminarReserva').hide();
+            $('#submitReserva').hide();
         }
 
         if (rol == 'ADMIN') {
-            $('#ufInput').removeClass('disabled');
+        	$('#ufInput').removeAttr('disabled')
         } else {
-            $('#ufInput').addClass('disabled');
+        	$('#ufInput').attr('disabled','true');
         }
 
         $('#fechaInicio').text(toStringDate(inicio));
@@ -254,6 +240,103 @@ $(document).ready(function() {
     	finalDate.setMinutes(hrsSplit[1]);
     	return finalDate;
     }
+    
+    $('#navbar').on('click', function(){
+    	
+    	if (event.target.classList[0] != "dropdown-toggle") {
+    		
+    		$("#misForms").children().hide();
+    		var id = event.target.href.split('#')[1];
+    		$("#"+id).show();
+    		
+	    	if (id=='calendar') {
+	    		$('.fc-today-button').click();
+	    	} else if (id=="usuario") {
+	    		$.ajax({
+	                url: '/usuario/'+contextUf,
+	        		type: 'GET',
+	                error: function(err) {
+	                	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+	                	$('#tituloErrorModal').html('<strong>Ups!</strong>');
+	                	$('#cuerpoErrorModal').text(err.responseJSON.message);
+	                	$('#errorsInfo').modal('show');
+	                },
+	                success: function(data) {
+                        $('#ufDeUsuario').val(data.uf);
+                        $('#piso').val(data.piso);
+                        $('#depto').val(data.depto);
+                        $('#email').val(data.email);
+                        $('#email2').val(data.email2);
+	                }
+	            });
+	    	}
+    	}
+    });
+    
+    
+    $( "#usuarioForm" ).validate( {
+		rules: {
+			password: {
+				required: false,
+				minlength: 4
+			},
+			confirmarPassword: {
+				required: false,
+				minlength: 4,
+				equalTo: "#password"
+			},
+			email: {
+				required: false,
+				email: true
+			},
+			email2: {
+				required: false,
+				email: true
+			},
+		},
+		messages: {
+			password1: {
+				minlength: "La contraseña al menos tiene que tener 4 caracteres"
+			},
+			confirm_password1: {
+				minlength: "La contraseña al menos tiene que tener 4 caracteres",
+				equalTo: "La contraseña ingresada con conicide con la de arriba. Corríjala!"
+			},
+		},
+		errorElement: "em",
+		errorPlacement: function ( error, element ) {
+			// Add the `help-block` class to the error element
+			error.addClass( "help-block" );
+
+			// Add `has-feedback` class to the parent div.form-group
+			// in order to add icons to inputs
+			element.parents( ".col-sm-5" ).addClass( "has-feedback" );
+
+			error.insertAfter( element );
+
+			// Add the span element, if doesn't exists, and apply the icon classes to it.
+			if ( !element.next( "span" )[ 0 ] ) {
+				$( "<span class='glyphicon glyphicon-remove form-control-feedback'></span>" ).insertAfter( element );
+			}
+		},
+		success: function ( label, element ) {
+			// Add the span element, if doesn't exists, and apply the icon classes to it.
+			if ( !$( element ).next( "span" )[ 0 ] ) {
+				$( "<span class='glyphicon glyphicon-ok form-control-feedback'></span>" ).insertAfter( $( element ) );
+			}
+		},
+		highlight: function ( element, errorClass, validClass ) {
+			$( element ).parents( ".col-sm-5" ).addClass( "has-error" ).removeClass( "has-success" );
+			$( element ).next( "span" ).addClass( "glyphicon-remove" ).removeClass( "glyphicon-ok" );
+		},
+		unhighlight: function ( element, errorClass, validClass ) {
+			$( element ).parents( ".col-sm-5" ).addClass( "has-success" ).removeClass( "has-error" );
+			$( element ).next( "span" ).addClass( "glyphicon-ok" ).removeClass( "glyphicon-remove" );
+		}
+	} );
+    
+    
+    
 });
 
 function epochToDate(epoch) {
@@ -288,3 +371,8 @@ function toStringDate(date) {
 function toStringHours(date) {
 	return date.format('HH') + ':' + date.format('mm');
 }
+
+
+
+
+

@@ -17,27 +17,48 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "usuario")
 public class Usuario implements UserDetails {
 	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setEmail2(String email2) {
+		this.email2 = email2;
+	}
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "EMAIL")
-	private String email;
+	@Column(name = "UF")
+	private String unidadFuncional;
 	
-	@Column(name = "PASSWORD")
+	@Column(name = "password")
 	private String password;
 	
-	@Column(name = "UF")
-	private Integer unidadFuncional;
-	
-	@Column(name = "ROL")
+	@Column(name = "rol")
 	private String rol;
+	
+	@Column(name = "piso")
+	private String piso;
+	
+	@Column(name = "depto")
+	private String depto;
+	
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "email2")
+	private String email2;
 	
 	@Override
 	public String getUsername() {
-		return this.email;
+		return this.unidadFuncional;
 	}
 
 	@Override
@@ -45,12 +66,24 @@ public class Usuario implements UserDetails {
 		return this.password;
 	}
 
-	public Integer getUnidadFuncional() {
-		return unidadFuncional;
-	}
-
 	public String getRol() {
 		return rol;
+	}
+
+	public String getPiso() {
+		return piso;
+	}
+
+	public String getDepto() {
+		return depto;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getEmail2() {
+		return email2;
 	}
 
 	@Override
