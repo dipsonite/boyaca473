@@ -10,21 +10,21 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "RESERVA")
+@Table(name = "reserva")
 public class Reserva {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "RESERVA_ID", unique = true, nullable = false)
+    @Column(name = "reserva_id", unique = true, nullable = false)
     private Integer id;
 
     @Column(name = "UF", nullable = false)
     private Integer unidadFuncional;
     
-    @Column(name = "INICIO", nullable = false)
+    @Column(name = "inicio", nullable = false)
     private Timestamp inicio;
     
-    @Column(name = "FIN", nullable = false)
+    @Column(name = "fin", nullable = false)
     private Timestamp fin;
     
     public Reserva() {

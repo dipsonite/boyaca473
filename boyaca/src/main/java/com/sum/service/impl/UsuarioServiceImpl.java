@@ -29,10 +29,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return user;
 	}
 	
+	@Transactional
 	@Override
 	public Usuario modificarUsuario(Usuario usuario, UsuarioDTO dto) throws UsuarioException {
 		Usuario usuarioContexto = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (usuarioContexto.getUsername().equals(String.valueOf(dto.getUf()))) {
+		if (!usuarioContexto.getUsername().equals(String.valueOf(dto.getUf()))) {
 			throw new UsuarioException("Usuario de contexto modificado.");
 		}
 		
@@ -42,10 +43,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if (!usuario.getEmail2().equals(dto.getEmail2())) {
 			usuario.setEmail2(dto.getEmail2());
 		}
-		if (!usuario.getPassword().equals(dto.getPassword())) {
+		if (dto.getPassword() != "" && dto.getPassword() != null && !usuario.getPassword().equals(dto.getPassword())) {
 			usuario.setPassword(dto.getPassword());
 		}
 		return usuarioDAO.update(usuario);
 	}
-	
 }

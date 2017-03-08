@@ -49,19 +49,11 @@ public class UsuarioController {
 		return new ResponseEntity<UsuarioDTO>(UsuarioTranslator.getUsuarioDTO(user), HttpStatus.OK);
 	}
 	
-	@RequestMapping(path="/modificar", method=RequestMethod.PUT, consumes="application/json")
+	@RequestMapping(path="/modificar", method=RequestMethod.POST, consumes="application/json")
 	@ResponseBody
-	public ResponseEntity<UsuarioDTO> actualizarReserva(@RequestBody UsuarioDTO dto) throws UsuarioException {
+	public ResponseEntity<UsuarioDTO> actualizarUsuario(@RequestBody UsuarioDTO dto) throws UsuarioException {
 		Usuario esteUsuario = (Usuario) usuarioService.loadUserByUsername(String.valueOf(dto.getUf()));
 		Usuario usuario = usuarioService.modificarUsuario(esteUsuario, dto);
 		return new ResponseEntity<UsuarioDTO>(UsuarioTranslator.getUsuarioDTO(usuario), HttpStatus.ACCEPTED);
 	}
-	
-//	@RequestMapping(path="/eliminar/{id}", method=RequestMethod.DELETE)
-//	@ResponseBody
-//	public ResponseEntity<HttpStatus> eliminarReserva(@PathVariable("id") Integer id) {
-//		usuarioService.eliminarReserva(id);
-//		return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
-//	}
-	
 }

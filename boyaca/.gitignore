@@ -26,3 +26,5 @@ nbdist/
 /mvnw.cmd
 /target/
 /target/
+/boyacaLog
+/boyacaLog.log
