@@ -12,12 +12,16 @@ import com.sum.dao.criteria.ReservaCriteria;
 import com.sum.domain.Reserva;
 import com.sum.exceptions.ReservaInvalidaException;
 import com.sum.service.ReservaService;
+import com.sum.service.UsuarioService;
 import com.sum.web.dto.ReservaDTO;
 
 @Service
 public class ReservaServiceImpl implements ReservaService {
 
 	private ReservaDAO dao;
+	
+	@Autowired
+	private UsuarioService userService;
 	
 	@Autowired
 	public ReservaServiceImpl(ReservaDAO reservaDAO) {
@@ -34,6 +38,10 @@ public class ReservaServiceImpl implements ReservaService {
 	@Override
 	public Reserva crearNuevaReserva(Reserva reserva) throws ReservaInvalidaException {
 		
+		if (!ufExiste(reserva.getUnidadFuncional())) {
+			throw new ReservaInvalidaException("La UF ("+reserva.getUnidadFuncional()+") ingresada no existe. Corríjala y vuelva a probar.");
+		}
+		
  		if (ufConReservaActiva(reserva.getUnidadFuncional(), reserva.getId())) {
 			throw new ReservaInvalidaException("La UF ya tiene una reserva activa. No es posible realizar otra reserva.");
 		}
@@ -45,6 +53,10 @@ public class ReservaServiceImpl implements ReservaService {
 		return dao.create(reserva);
 	}
 	
+	private boolean ufExiste(Integer unidadFuncional) {
+		return userService.loadUserByUsername(String.valueOf(unidadFuncional)) == null ? false : true;
+	}
+
 	@Transactional
 	@Override
 	public void eliminarReserva(Integer id) {
@@ -54,6 +66,9 @@ public class ReservaServiceImpl implements ReservaService {
 	@Transactional
 	@Override
 	public Reserva modificarReserva(Reserva reserva, ReservaDTO dto) throws ReservaInvalidaException {
+		if (!ufExiste(reserva.getUnidadFuncional())) {
+			throw new ReservaInvalidaException("La UF ("+reserva.getUnidadFuncional()+") ingresada no existe. Corríjala y vuelva a probar.");
+		}
 		if (hayReservaSolapada(reserva.getId(), dto.getStart(), dto.getEnd())) {
 			throw new ReservaInvalidaException("Esta reserva se solapa con otra. Modifique las fechas de inicio y fin y reintente.");
 		}
