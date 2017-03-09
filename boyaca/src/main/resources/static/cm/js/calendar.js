@@ -27,6 +27,7 @@ $(document).ready(function() {
         selectable: false,
         contentHeight: 750,
         editable: false,
+        nowIndicator: false,
         eventLimit: true,
         events: function(start, end, timezone, callback) {
             $.ajax({
@@ -76,15 +77,27 @@ $(document).ready(function() {
             }
         },
         dayRender: function(date, cell) {
-        	if (date < moment().utc().startOf('day').add('-1','days')) {
+        	if (date.endOf('day') < moment().startOf('day')) {
                 cell.css('background-color', '#f2f2f2');
             }
         },
         dayClick: function(date, event, view) {
-        	if (date < moment().utc().startOf('day').add('-1','days')) {
+        	if (date.endOf('day') < moment().startOf('day')) {
                 return false;
             } else {
-                loadModal(null, contextUf, date, date);
+            	var ini = moment({
+            		'year': date.get('year'),
+            		'month': date.get('month'),
+            		'date': date.get('date'),
+            		'hour': 8
+            	});
+            	var fin = moment({
+            		'year': date.get('year'),
+            		'month': date.get('month'),
+            		'date': date.get('date'),
+            		'hour': 20
+            	});
+                loadModal(null, contextUf, ini, fin);
             }
         },
         eventClick: function(event, jsEvent, view) {
@@ -131,7 +144,36 @@ $(document).ready(function() {
         var horaInicio = $('#horaInicio').val();
         var fechaFin = $('#fechaFin').text();
         var horaFin = $('#horaFin').val();
-
+        
+        if (horaInicio.split(':')[0] < 8) {
+        	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+        	$('#tituloErrorModal').html('<strong>Ups!</strong>');
+        	$('#cuerpoErrorModal').html('<p>La hora de inicio debe ser posterior a las 08:00.</p>');
+        	$('#errorsInfo').modal('show'); 
+        	return;
+        }
+        
+        if (horaFin.split(':')[0] > 2 && horaFin.split(':')[0] < 8) {
+        	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+        	$('#tituloErrorModal').html('<strong>Ups!</strong>');
+        	$('#cuerpoErrorModal').html('<p>La hora de fin debe ser anterior a las 02:00.</p>');
+        	$('#errorsInfo').modal('show'); 
+        	return;
+        }
+        
+//    	var startTime = moment(horaInicio, "HH:mm");
+//    	var endTime = moment(horaFin, "HH:mm");
+//    	var duration = moment.duration(endTime.diff(startTime));
+//    	
+//    	if (duration._milliseconds>0) {
+//    		return ;
+//    	}
+//    		$('#fechaFin').text(toStringDate(moment(fechaReserva,'DD/MM/YYYY')));
+//    	} else {
+//    		$('#fechaFin').text(toStringDate(moment(fechaReserva,'DD/MM/YYYY').add(1,'days')));
+//    	}
+      
+        
         var eventData;
         eventData = {
             id: idRes == '' ? null : idRes,
@@ -308,7 +350,7 @@ $(document).ready(function() {
     });
     
     
-    $( "#usuarioForm" ).validate( {
+    $("#usuarioForm").validate( {
 		rules: {
 			password: {
 				required: false,

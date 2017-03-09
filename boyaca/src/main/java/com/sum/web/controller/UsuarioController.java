@@ -29,19 +29,6 @@ public class UsuarioController {
 		usuarioService = service;
 	}
 	
-//	@RequestMapping(path="/", consumes="application/json", method=RequestMethod.POST)
-//    @ResponseBody
-//    public ResponseEntity<List<ReservaDTO>> recuperarReservas(@RequestBody ReservaCriteria criteria) {
-//		LOGGER.debug("> retrieveReservas");
-//		List<ReservaDTO> reservasDTO = new ArrayList<ReservaDTO>();
-//        List<Reserva> reservas = reservaService.buscarReservasConCriteria(criteria);
-//        for (Reserva reserva : reservas) {
-//        	reservasDTO.add(ReservaTranslator.getReservaDTO(reserva));
-//		}
-//        LOGGER.debug("< retrieveReservas");
-//		return new ResponseEntity<List<ReservaDTO>>(reservasDTO, HttpStatus.OK);
-//    }
-	
 	@RequestMapping(value = "/{idUser}", method = RequestMethod.GET)
 	public ResponseEntity<UsuarioDTO> getUsuario(@PathVariable("idUser") Integer id) {
 		LOGGER.debug("Recuperamos el usuario por ID: " + id);

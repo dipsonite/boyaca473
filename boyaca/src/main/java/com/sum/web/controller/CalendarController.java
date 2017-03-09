@@ -13,7 +13,12 @@ import com.sum.domain.Usuario;
 public class CalendarController {
 	
 	private static final Log LOGGER = LogFactory.getLog(CalendarController.class);
-
+	
+	@RequestMapping(value = "/")
+	public ModelAndView home() {
+		return calendar();
+	}
+	
 	@RequestMapping(value = "/calendar")
 	public ModelAndView calendar() {
 		LOGGER.debug("> calendar()");

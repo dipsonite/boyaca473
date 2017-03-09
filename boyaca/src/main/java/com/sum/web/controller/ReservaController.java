@@ -49,7 +49,8 @@ public class ReservaController {
 		List<ReservaDTO> reservasDTO = new ArrayList<ReservaDTO>();
         List<Reserva> reservas = reservaService.buscarReservasConCriteria(criteria);
         for (Reserva reserva : reservas) {
-        	reservasDTO.add(ReservaTranslator.getReservaDTO(reserva));
+        	ReservaDTO dto = ReservaTranslator.getReservaDTO(reserva);
+        	reservasDTO.add(dto);
 		}
         LOGGER.debug("< retrieveReservas");
 		return new ResponseEntity<List<ReservaDTO>>(reservasDTO, HttpStatus.OK);

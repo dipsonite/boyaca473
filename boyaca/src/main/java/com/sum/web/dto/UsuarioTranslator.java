@@ -7,8 +7,4 @@ public class UsuarioTranslator {
 		return new UsuarioDTO(Integer.valueOf(user.getUsername()), user.getPiso(), user.getDepto(), 
 				user.getEmail(), user.getEmail2(), user.getPassword());
 	}
-	
-//	public static Usuario translate(UsuarioDTO dto) {
-//		return new Usuario();
-//	}
 }
