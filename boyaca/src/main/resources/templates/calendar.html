@@ -2,6 +2,7 @@
 <html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+	<title>Boyacá 473</title>
 	<meta name="_csrf" th:content="${_csrf.token}" />
     <meta charset='utf-8' />
     <script src='../lib/jquery.min.js' type="text/javascript"></script>
@@ -79,7 +80,7 @@
 	<!--     </div> -->
 		
 	    <div id="usuario" style="display:none;">
-	    	<div class="form-horizontal" id="usuarioForm" >
+	    	<form class="form-horizontal" id="usuarioForm" >
 		    	<h2>Datos del Usuario</h2>
 	    		<p>Aquí podrás editar los datos de tu usuario: </p>
 				<br/><br/>
@@ -107,7 +108,7 @@
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="email">Email primario</label>
 					<div class="col-sm-5">
-						<input type="text" class="form-control" id="email" placeholder="Email" />
+						<input type="text" class="form-control" id="email" name="email" placeholder="Email" />
 					</div>
 				</div>
 				
@@ -121,14 +122,14 @@
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="password">Contrase&ntilde;a</label>
 					<div class="col-sm-5">
-						<input type="password" class="form-control" id="password" placeholder="Contrase&ntilde;a" />
+						<input type="password" class="form-control" id="password" name="password" placeholder="Contrase&ntilde;a" />
 					</div>
 				</div>
 			
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="confirmarPassword">Confirmar contrase&ntilde;a</label>
 					<div class="col-sm-5">
-						<input type="password" class="form-control" id="confirmarPassword" placeholder="Confirmá la contrase&ntilde;a" />
+						<input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" placeholder="Confirmá la contrase&ntilde;a" />
 					</div>
 				</div>
 			
@@ -137,7 +138,7 @@
 						<button type="submit" class="btn btn-primary" id="submitUsuario">Guardar</button>
 					</div>
 				</div>
-			</div>
+			</form>
 	    </div>
     </div>
     

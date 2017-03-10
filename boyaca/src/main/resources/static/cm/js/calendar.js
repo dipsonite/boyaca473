@@ -146,6 +146,7 @@ $(document).ready(function() {
         var horaFin = $('#horaFin').val();
         
         if (horaInicio.split(':')[0] < 8) {
+        	$('#errorsInfo').removeClass('alert-danger alert-success');
         	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
         	$('#tituloErrorModal').html('<strong>Ups!</strong>');
         	$('#cuerpoErrorModal').html('<p>La hora de inicio debe ser posterior a las 08:00.</p>');
@@ -154,25 +155,13 @@ $(document).ready(function() {
         }
         
         if (horaFin.split(':')[0] > 2 && horaFin.split(':')[0] < 8) {
+        	$('#errorsInfo').removeClass('alert-danger alert-success');
         	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
         	$('#tituloErrorModal').html('<strong>Ups!</strong>');
         	$('#cuerpoErrorModal').html('<p>La hora de fin debe ser anterior a las 02:00.</p>');
         	$('#errorsInfo').modal('show'); 
         	return;
         }
-        
-//    	var startTime = moment(horaInicio, "HH:mm");
-//    	var endTime = moment(horaFin, "HH:mm");
-//    	var duration = moment.duration(endTime.diff(startTime));
-//    	
-//    	if (duration._milliseconds>0) {
-//    		return ;
-//    	}
-//    		$('#fechaFin').text(toStringDate(moment(fechaReserva,'DD/MM/YYYY')));
-//    	} else {
-//    		$('#fechaFin').text(toStringDate(moment(fechaReserva,'DD/MM/YYYY').add(1,'days')));
-//    	}
-      
         
         var eventData;
         eventData = {
@@ -191,6 +180,7 @@ $(document).ready(function() {
             dataType: 'json',
             data: JSON.stringify(eventData),
             error: function(err) {
+            	$('#errorsInfo').removeClass('alert-danger alert-success');
             	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
             	$('#tituloErrorModal').html('<strong>Ups!</strong>');
             	$('#cuerpoErrorModal').text(err.responseJSON.message);
@@ -211,40 +201,6 @@ $(document).ready(function() {
         });
 
         $('#nuevaReserva').modal('hide');
-    });
-    
-    
-    $('#submitUsuario').click(function() {
-    	
-    	var data = {
-    		uf: contextUf,
-    		email: $('#email').val(),
-			email2: $('#email2').val(),
-			password: $('#password').val(), 
-    	}
-
-    	$.ajax({
-    		url: '/usuario/modificar',
-    		type: 'POST',
-    		contentType: "application/json",
-    		dataType: 'json',
-    		data: JSON.stringify(data),
-    		error: function(err) {
-    			$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
-    			$('#tituloErrorModal').html('<strong>Ups!</strong>');
-    			$('#cuerpoErrorModal').text(err.responseJSON.message);
-    			$('#errorsInfo').modal('show');
-    		},
-    		success: function(data) {
-    			$('#errorsInfo').addClass('alert alert-success alert-dismissible');
-    			$('#tituloErrorModal').html('<strong>Perfecto!!</strong>');
-    			$('#cuerpoErrorModal').html('<p>Datos del usuario modificados correctamente</p>');
-    			$('#errorsInfo').modal('show');
-    			$('#password').val('');
-    			$('#confirmarPassword').val('');
-    		}
-    	});
-
     });
 
     $('#eliminarReserva').click(function() {
@@ -332,6 +288,7 @@ $(document).ready(function() {
 	                url: '/usuario/'+contextUf,
 	        		type: 'GET',
 	                error: function(err) {
+	                	$('#errorsInfo').removeClass('alert-danger alert-success');
 	                	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
 	                	$('#tituloErrorModal').html('<strong>Ups!</strong>');
 	                	$('#cuerpoErrorModal').text(err.responseJSON.message);
@@ -349,6 +306,50 @@ $(document).ready(function() {
     	}
     });
     
+    $("#usuarioForm").submit( function () {
+    	
+    	var errors = $("#usuarioForm").find('div.has-error');
+    	if (errors.length != 0 || $('#password').val() != $('#confirmarPassword').val()) {
+    		$('#errorsInfo').removeClass('alert-danger alert-success');
+    		$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+        	$('#tituloErrorModal').html('<strong>Ups!</strong>');
+        	$('#cuerpoErrorModal').html('<p>Hay errores en el formulario. Solucionalo y volvé a probar.</p>');
+        	$('#errorsInfo').modal('show'); 
+        	return false;
+    	}
+    	
+    	var data = {
+        		uf: contextUf,
+        		email: $('#email').val(),
+    			email2: $('#email2').val(),
+    			password: $('#password').val(), 
+        	}
+
+        	$.ajax({
+        		url: '/usuario/modificar',
+        		type: 'POST',
+        		contentType: "application/json",
+        		dataType: 'json',
+        		data: JSON.stringify(data),
+        		error: function(err) {
+        			$('#errorsInfo').removeClass('alert-danger alert-success');
+        			$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+        			$('#tituloErrorModal').html('<strong>Ups!</strong>');
+        			$('#cuerpoErrorModal').text(err.responseJSON.message);
+        			$('#errorsInfo').modal('show');
+        		},
+        		success: function(data) {
+        			$('#errorsInfo').removeClass('alert-danger alert-success');
+        			$('#errorsInfo').addClass('alert alert-success alert-dismissible');
+        			$('#tituloErrorModal').html('<strong>Perfecto!!</strong>');
+        			$('#cuerpoErrorModal').html('<p>Datos del usuario modificados correctamente</p>');
+        			$('#errorsInfo').modal('show');
+        			$('#password').val('');
+        			$('#confirmarPassword').val('');
+        		}
+        	});
+    	return false;
+    });
     
     $("#usuarioForm").validate( {
 		rules: {
@@ -357,7 +358,9 @@ $(document).ready(function() {
 				minlength: 4
 			},
 			confirmarPassword: {
-				required: false,
+				required: function() {
+					return $('#password').val() != '' ? true : false;
+				},
 				minlength: 4,
 				equalTo: "#password"
 			},
@@ -368,15 +371,6 @@ $(document).ready(function() {
 			email2: {
 				required: false,
 				email: true
-			},
-		},
-		messages: {
-			password1: {
-				minlength: "La contraseña al menos tiene que tener 4 caracteres"
-			},
-			confirm_password1: {
-				minlength: "La contraseña al menos tiene que tener 4 caracteres",
-				equalTo: "La contraseña ingresada con conicide con la de arriba. Corríjala!"
 			},
 		},
 		errorElement: "em",
