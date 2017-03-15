@@ -12,7 +12,6 @@ $(document).ready(function() {
     var contextUf = $("#contextUf").val();
     var rol = $("#contextRol").val();
     var today = $('#calendar').fullCalendar('getDate');
-    var tgl = moment(today).format('YYYY/MM');
 
     $('#calendar').fullCalendar({
         header: {
@@ -44,9 +43,12 @@ $(document).ready(function() {
                     $(doc).each(function() {
                         events.push({
                             id: $(this)[0].id,
-                            title: $(this)[0].title,
+                            title: $(this)[0].piso+'° '+$(this)[0].depto,
                             start: $(this)[0].start,
-                            end: $(this)[0].end
+                            end: $(this)[0].end,
+                            uf: $(this)[0].uf,
+                            email: $(this)[0].email,
+                            email2: $(this)[0].email2,
                         });
                     });
                     callback(events);
@@ -57,7 +59,8 @@ $(document).ready(function() {
         displayEventTime: false,
         eventRender: function(event, element) {
         	
-            element.find('.fc-title').before("UF: ")
+//            element.find('.fc-title').before("UF: ")
+            element.find('.fc-title')
                 .append("<br/>").append(epochToDate(event.start))
                 .append(" - ").append(epochToDate(event.end));
 
@@ -66,7 +69,7 @@ $(document).ready(function() {
                 element.css('background-color', '#8c8c8c');
                 element.css('border-color', '#8c8c8c');
                 element.disable = true;
-            } else if (contextUf == event.title) {
+            } else if (contextUf == event.uf) {
                 $(element).addClass("btn btn-success");
                 element.css('background-color', '#449d44');
                 element.css('border-color', '#398439');
@@ -97,14 +100,14 @@ $(document).ready(function() {
             		'date': date.get('date'),
             		'hour': 20
             	});
-                loadModal(null, contextUf, ini, fin);
+                loadModal(null, contextUf, ini, fin, null, null);
             }
         },
         eventClick: function(event, jsEvent, view) {
             if (moment(event.start) < moment(today)) {
                 return;
             } else {
-            	loadModal(event.id, event.title, event.start, event.end);
+            	loadModal(event.id, event.uf, event.start, event.end, event.email, event.email2);
             }
         }
     });
@@ -166,7 +169,7 @@ $(document).ready(function() {
         var eventData;
         eventData = {
             id: idRes == '' ? null : idRes,
-            title: uf,
+            uf: uf,
             start: formatDateForSubmit(fechaInicio, horaInicio).getTime(),
             end: formatDateForSubmit(fechaFin, horaFin).getTime() 
         };
@@ -189,7 +192,7 @@ $(document).ready(function() {
             success: function(data) {
             	eventData = {
                         id: data.id,
-                        title: data.title,
+                        title: data.uf,
                         start: data.start,
                         end: data.end
                     };
@@ -222,7 +225,7 @@ $(document).ready(function() {
         $('#nuevaReserva').modal('hide');
     });
     
-    function loadModal(id, title, inicio, fin) {
+    function loadModal(id, title, inicio, fin, email, email2) {
     	
     	if (id==null) {
     		$('#tituloModal').text("Nueva Reserva");
@@ -251,14 +254,38 @@ $(document).ready(function() {
         } else {
         	$('#ufInput').attr('disabled','true');
         }
-
-        $('#fechaInicio').text(toStringDate(inicio));
-        var hora = toStringHours(inicio);
-        $('#horaInicio').timepicker('setTime',hora);
+        
+        var fecha = toStringDate(inicio);
+        $('#fechaInicio').text(fecha);
+        var horaInicio = toStringHours(inicio);
+        $('#horaInicio').timepicker('setTime',horaInicio);
         
         $('#fechaFin').text(toStringDate(fin));
-        hora = toStringHours(fin);
-        $('#horaFin').timepicker('setTime',hora);
+        var horaFin = toStringHours(fin);
+        $('#horaFin').timepicker('setTime',horaFin);
+        
+        var subject = '?subject=Boyacá 473: Reserva de SUM '+fecha+' '+horaInicio+' - '+horaFin;
+        if ((email!=null && email!="") || (email2!=null && email2!="")) {
+        	$('#datosDeContacto').show();
+        } else {
+        	$('#datosDeContacto').hide();
+        }
+        
+        $('#emailModal').attr('href','mailto:'+email+subject);
+        if (email!=null && email!="") {
+        	$('#emailModalLi').show();
+        	$('#emailModal').text(email);
+        } else {
+        	$('#emailModalLi').hide();
+        }
+        
+        $('#email2Modal').attr('href','mailto:'+email2+subject);
+        if (email2!=null && email2!="") {
+        	$('#email2ModalLi').show();
+        	$('#email2Modal').text(email2);
+        } else {
+        	$('#email2ModalLi').hide();
+        }
         
         $('#nuevaReserva').modal('show');
     }
@@ -278,30 +305,33 @@ $(document).ready(function() {
     	if (event.target.classList[0] != "dropdown-toggle") {
     		
     		$("#misForms").children().hide();
-    		var id = event.target.href.split('#')[1];
-    		$("#"+id).show();
+    		if (event.target.href != undefined) {
     		
-	    	if (id=='calendar') {
-	    		$('.fc-today-button').click();
-	    	} else if (id=="usuario") {
-	    		$.ajax({
-	                url: '/usuario/'+contextUf,
-	        		type: 'GET',
-	                error: function(err) {
-	                	$('#errorsInfo').removeClass('alert-danger alert-success');
-	                	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
-	                	$('#tituloErrorModal').html('<strong>Ups!</strong>');
-	                	$('#cuerpoErrorModal').text(err.responseJSON.message);
-	                	$('#errorsInfo').modal('show');
-	                },
-	                success: function(data) {
-                        $('#ufDeUsuario').val(data.uf);
-                        $('#piso').val(data.piso);
-                        $('#depto').val(data.depto);
-                        $('#email').val(data.email);
-                        $('#email2').val(data.email2);
-	                }
-	            });
+	    		var id = event.target.href.split('#')[1];
+	    		$("#"+id).show();
+	    		
+		    	if (id=='calendar') {
+		    		$('.fc-today-button').click();
+		    	} else if (id=="usuario") {
+		    		$.ajax({
+		                url: '/usuario/'+contextUf,
+		        		type: 'GET',
+		                error: function(err) {
+		                	$('#errorsInfo').removeClass('alert-danger alert-success');
+		                	$('#errorsInfo').addClass('alert alert-danger alert-dismissible');
+		                	$('#tituloErrorModal').html('<strong>Ups!</strong>');
+		                	$('#cuerpoErrorModal').text(err.responseJSON.message);
+		                	$('#errorsInfo').modal('show');
+		                },
+		                success: function(data) {
+	                        $('#ufDeUsuario').val(data.uf);
+	                        $('#piso').val(data.piso);
+	                        $('#depto').val(data.depto);
+	                        $('#email').val(data.email);
+	                        $('#email2').val(data.email2);
+		                }
+		            });
+		    	}
 	    	}
     	}
     });
@@ -404,9 +434,7 @@ $(document).ready(function() {
 			$( element ).next( "span" ).addClass( "glyphicon-ok" ).removeClass( "glyphicon-remove" );
 		}
 	} );
-    
-    
-    
+
 });
 
 function epochToDate(epoch) {
@@ -442,7 +470,8 @@ function toStringHours(date) {
 	return date.format('HH') + ':' + date.format('mm');
 }
 
-
-
+function desloguear() {
+	document.logoutForm.submit();
+}
 
 

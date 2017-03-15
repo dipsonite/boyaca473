@@ -81,6 +81,11 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
         	Predicate pred = builder.equal(reserva.get("unidadFuncional"), criteria.getUf());
 			predicates.add(pred);
         }
+        
+        if (criteria.getIdReserva() != null) {
+        	Predicate pred = builder.notEqual(reserva.get("id"), criteria.getIdReserva());
+			predicates.add(pred);
+        }
 
         if(criteria.getMax() != null) {
         	Predicate pred = builder.greaterThanOrEqualTo(reserva.get("fin"), criteria.getMax());

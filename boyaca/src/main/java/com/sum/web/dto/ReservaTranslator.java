@@ -1,14 +1,21 @@
 package com.sum.web.dto;
 
-import com.sum.domain.Reserva;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.sum.domain.Reserva;
+import com.sum.service.UsuarioService;
+
+@Component
 public class ReservaTranslator {
-	public static ReservaDTO getReservaDTO(Reserva reserva) {
-		return new ReservaDTO(reserva.getId(), reserva.getUnidadFuncional(),
-				reserva.getInicio(), reserva.getFin());
-	}
 	
-	public static Reserva translate(ReservaDTO dto) {
-		return new Reserva(dto.getTitle(), dto.getStart(), dto.getEnd());
+	@Autowired
+	public UsuarioService service;
+	
+	public ReservaDTO getReservaDTO(Reserva reserva) {
+		return new ReservaDTO(reserva.getId(), Integer.valueOf(reserva.getUnidadFuncional().getUsername()),
+				reserva.getUnidadFuncional().getPiso(), reserva.getUnidadFuncional().getDepto(),
+				reserva.getInicio(), reserva.getFin(), 
+				reserva.getUnidadFuncional().getEmail(), reserva.getUnidadFuncional().getEmail2());
 	}
 }

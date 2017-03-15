@@ -9,20 +9,36 @@ public class ReservaDTO {
 	
 	@JsonCreator
 	public ReservaDTO(@JsonProperty("id") Integer reservaId,
-			@JsonProperty("title") Integer uf,
+			@JsonProperty("uf") Integer uf,
+			@JsonProperty("piso") String piso,
+			@JsonProperty("depto") String depto,
 			@JsonProperty("start") Timestamp inicio,
-			@JsonProperty("end") Timestamp fin) {
+			@JsonProperty("end") Timestamp fin,
+			@JsonProperty("email") String email,
+			@JsonProperty("email2") String email2) {
 		this.id = reservaId;
 		this.start = inicio;
 		this.end = fin;
-		this.title = uf;
+		this.piso = piso;
+		this.depto = depto;
+		this.uf = uf;
+		this.email = email;
+		this.email2 = email2;
 	}
 
 	private Integer id;
-	private Integer title;
+	private String piso;
+	private String depto;
 	private Timestamp start;
 	private Timestamp end;
+	private Integer uf;
+	private String email;
+	private String email2;
 	
+	public String getDepto() {
+		return depto;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -31,8 +47,20 @@ public class ReservaDTO {
 		this.id = id;
 	}
 
-	public Integer getTitle() {
-		return title;
+	public Integer getUf() {
+		return uf;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getEmail2() {
+		return email2;
+	}
+
+	public String getPiso() {
+		return piso;
 	}
 	
 	public Timestamp getStart() {
