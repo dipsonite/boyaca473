@@ -72,4 +72,22 @@ public class Reserva {
 	public void setFin(Timestamp fin) {
 		this.fin = fin;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("Reserva ");
+		if (this.id != null) {
+			builder.append("ID: ").append(this.id);
+		}
+		if (this.unidadFuncional != null) {
+			builder.append(" UF: ").append(this.unidadFuncional.getUsername());
+		}
+		if (this.inicio != null) {
+			builder.append(" Inicio: ").append(this.inicio);
+		}
+		if (this.fin != null) {
+			builder.append(" Fin: ").append(this.fin);
+		}
+		return builder.toString();
+	}
 }

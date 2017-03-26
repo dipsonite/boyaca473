@@ -11,20 +11,29 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 import com.sum.dao.criteria.ReservaCriteria;
 import com.sum.domain.Reserva;
+import com.sum.domain.Usuario;
 
 @Repository
 public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
 	
+	private static final Log LOGGER = LogFactory.getLog(ReservaDAO.class);
+	
 	@PersistenceContext(unitName = "entityManagerFactory")
 	private EntityManager entityManager;
+	
+//	private Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 	@Override
 	public Reserva create(Reserva entity) {
 		this.entityManager.persist(entity);
+		LOGGER.info("El usuario ".concat(((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).concat(" crea la reserva ").concat(entity.toString()));
 		return entity;
 	}
 
@@ -35,13 +44,16 @@ public class ReservaDAO implements GenericPersistentDAO<Reserva, Integer> {
 
 	@Override
 	public Reserva update(Reserva entity) {
-		this.retrieve(entity.getId());
+//		this.retrieve(entity.getId());
+		LOGGER.info("El usuario ".concat(((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).concat(" modifica la reserva ").concat(entity.toString()));
 		return this.entityManager.merge(entity);
 	}
 
 	@Override
 	public void delete(Integer id) {
-		this.entityManager.remove(this.retrieve(id));
+		Reserva entity = this.retrieve(id);
+		LOGGER.info("El usuario ".concat(((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).concat(" elimina la reserva ").concat(entity.toString()));
+		this.entityManager.remove(entity);
 	}
 
 	public List<Reserva> getReservasEntreFechas(ReservaCriteria criteria) {
