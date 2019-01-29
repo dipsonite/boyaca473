@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 
 <head>
-	<title>Boyacá 473</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="_csrf" th:content="${_csrf.token}" />
-    <meta charset='utf-8' />
+    <title>Boyacá 473</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta charset='utf-8'/>
     <script src='../lib/jquery.min.js' type="text/javascript"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-    <link href='../fullcalendar.min.css' rel='stylesheet' />
-    <link href='../fullcalendar.print.min.css' rel='stylesheet' media='print' />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link href='../fullcalendar.min.css' rel='stylesheet'/>
+    <link href='../fullcalendar.print.min.css' rel='stylesheet' media='print'/>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src='../lib/moment.min.js'></script>
     <script src='../fullcalendar.js'></script>
     <script src='../locale/es.js'></script>
     <script src='../cm/js/calendar.js'></script>
-    <link href='../cm/css/calendar.css' rel='stylesheet' />
+    <link href='../cm/css/calendar.css' rel='stylesheet'/>
     <script src='../bootstrap-timepicker.min.js'></script>
-    <link href='../bootstrap-timepicker.min.css' rel='stylesheet' />
+    <link href='../bootstrap-timepicker.min.css' rel='stylesheet'/>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/json2/20160511/json2.min.js"></script>
     <script type="text/javascript" src="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.js"></script>
     <script src='../jquery.validate.min.js'></script>
@@ -25,217 +27,229 @@
 </head>
 
 <body>
-    <form name="logoutForm" th:action="@{/logout}" method="POST" th:hidden="true">
-        <button id="logout" hidden="true" type="submit" class="btn-link"></button>
-    </form>
-    
-    <input type="hidden" id="contextUf" th:value="${uf}" />
-    <input type="hidden" id="contextRol" th:value="${rol}" />
-	
-    <!-- Fixed navbar -->
+<form name="logoutForm" th:action="@{/logout}" method="POST" th:hidden="true">
+    <button id="logout" hidden="true" type="submit" class="btn-link"></button>
+</form>
+
+<input type="hidden" id="contextUf" th:value="${uf}"/>
+<input type="hidden" id="contextRol" th:value="${rol}"/>
+
+<!-- Fixed navbar -->
 <!--     <nav class="navbar navbar-default navbar-fixed-top"> -->
-    <nav class="navbar navbar-default navbar-justified">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-		            <span class="sr-only">Toggle navigation</span>
-		            <span class="icon-bar"></span>
-		            <span class="icon-bar"></span>
-		            <span class="icon-bar"></span>
-		        </button>
-                <a class="navbar-brand" href="/calendar/">Boyacá 473</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse" data-toggle="collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="#calendar">Calendario</a></li>
-                    <li><a href="#reglas" >Reglas del SUM</a></li>
-					<!-- <li><a href="#contacto">Contacto</a></li> -->
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown">
-					  <a href="/calendar/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" 
-					  	aria-expanded="false" th:inline="text">Unidad Funcional: [[${uf}]] <span class="caret"></span></a>
-					  <ul class="dropdown-menu">
-					    <li><a href="#usuario">Editar</a></li>
-					    <li role="separator" class="divider"></li>
-					    <li><a href="#" onclick="desloguear()">Salir</a></li>
-					  </ul>
-					</li>
-                </ul>
-            </div>
-            <!--/.nav-collapse -->
+<nav class="navbar navbar-default navbar-justified">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/calendar/">Boyacá 473</a>
         </div>
-    </nav>
-    
-    <div id="misForms">
-    
-	    <div id="calendar" style="align:center;"></div>
-	    
-	    <div id="reglas" style="display:none;">
-	    	<h2>Reglas del SUM</h2>
-	    	<p>Las reglas del SUM pronto estarán disponibles en esta sección.</p>
-	    </div>
-	    
-	<!--     <div class="hidden" id="conacto"> -->
-	<!--     	<h2>Contacto</h2> -->
-	<!--     	<p>Para contactarse con el consejo:</p> -->
-	    	
-	<!--     </div> -->
-		
-	    <div id="usuario" class="container-fluid panel panel-default" style="display:none;">
-	    	<form class="form-horizontal" id="usuarioForm" >
-	    		
-	    		<div class="form-group panel panel-header" style="text-align:center">
-			    	<header>
-				    	<h2 >Datos del Usuario</h2>
-			    		<p>Aquí podrás editar los datos de tu usuario: </p>
-			   		</header>
-		   		</div>
-				<br/>
-				<div class="form-group panel panel-body" style="text-align:center">
-				
-					<div class="form-group">
-						<label class="col-sm-4 control-label" for="ufDeUsuario">Unidad Funcional</label>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" id="ufDeUsuario" placeholder="Unidad Funcional" disabled="true"/>
-						</div>
-					</div>
-				
-					<div class="row form-group">
-						<label class="col-sm-4 control-label" for="piso">Piso</label>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" id="piso" placeholder="Piso" disabled="true"/>
-						</div>
-					</div>
-				
-					<div class="form-group">
-						<label class="col-sm-4 control-label" for="depto">Departamento</label>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" id="depto" placeholder="Departamento" disabled="true"/>
-						</div>
-					</div>
-					
-					<hr/>
-					
-					<div class="form-group panel-body">
-						<span> Si querés cambiar tu contraseña, ingresa una nueva aquí:</span>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-sm-4 control-label" for="password">Contrase&ntilde;a</label>
-						<div class="col-sm-5">
-							<input type="password" class="form-control" id="password" name="password" placeholder="Contrase&ntilde;a" />
-						</div>
-					</div>
-				
-					<div class="form-group">
-						<label class="col-sm-4 control-label" for="confirmarPassword">Confirmar contrase&ntilde;a</label>
-						<div class="col-sm-5">
-							<input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" placeholder="Confirmá la contrase&ntilde;a" />
-						</div>
-					</div>
-					
-					<hr/>
-					
-					<div class="form-group panel-body">
-						<span> Opcional: Registrá hasta dos e-mails de contacto los cuales figurarán en tus reservas: </span>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-sm-4 control-label" for="email">Email</label>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" id="email" name="email" placeholder="Email" />
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-sm-4 control-label" for="email2">Email alternativo</label>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" id="email2" name="email2" placeholder="Email" />
-						</div>
-					</div>
-				</div>
-				<div class="panel panel-body">
-					<div class="form-group">
-						<div class="col-sm-offset-4 col-sm-5">
-							<button type="submit" class="btn btn-success form-control" id="submitUsuario">Guardar</button>
-						</div>
-					</div>
-				</div>
-			</form>
-	    </div>
+        <div id="navbar" class="navbar-collapse collapse" data-toggle="collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#calendar">Calendario</a></li>
+                <li><a href="#reglas">Reglas del SUM</a></li>
+                <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/admin/">Administrar usuarios</a></li>
+                <!-- <li><a href="#contacto">Contacto</a></li> -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="/calendar/" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true"
+                       aria-expanded="false" th:inline="text">Unidad Funcional: [[${uf}]] <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#usuario">Editar</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="desloguear()">Salir</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
     </div>
-    
-    <div class="modal fade" id="nuevaReserva" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="tituloModal"></h4>
-                </div>
-                <div class="modal-body">
-                    <div class="datosReserva">
-                    	<input type="hidden" id="idReserva" />
-                        <label>UF: </label>
-                        <input id="ufInput" type="text" class="form-control input-small" placeholder="Ingrese Unidad Funcional..."></input>
-                    	<br/>
-                      	<div class="input-group">
-                      		<label>Hora de Inicio: </label>
-							<div class="input-group bootstrap-timepicker timepicker">
-                      			<span id="fechaInicio" class="input-group-addon"></span>
-	                            <input id="horaInicio" type="text" class="form-control input-small" placeholder="Ingrese hora de inicio..."></input>
-	                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                        	</div>
-				  	 	</div>
-				  	 	<br/>
-				  	 	<div class="input-group">
-				  	 		<label>Hora de Fin: </label>
-							<div class="input-group bootstrap-timepicker timepicker">
-                      			<span id="fechaFin" class="input-group-addon"></span>
-	                            <input id="horaFin" type="text" class="form-control input-small" placeholder="Ingrese hora de fin..."></input>
-	                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                        	</div>
-				  	 	</div>
-				  	 	<br/>
-				  	 	<label id="datosDeContacto">¿Querés contactar al due&ntilde;o de esta reserva?</label>
-				  	 	<ul>
-					  	 	<li id="emailModalLi"><a id="emailModal" target="_blank"></a></li>
-	                        <li id="email2ModalLi"><a id="email2Modal" target="_blank"></a></li>
-				  	 	</ul>
+</nav>
+
+<div id="misForms">
+
+    <div id="calendar" style="align:center;"></div>
+
+    <div id="reglas" style="display:none;">
+        <h2>Reglas del SUM</h2>
+        <p>Las reglas del SUM pronto estarán disponibles en esta sección.</p>
+    </div>
+
+    <!--     <div class="hidden" id="conacto"> -->
+    <!--     	<h2>Contacto</h2> -->
+    <!--     	<p>Para contactarse con el consejo:</p> -->
+
+    <!--     </div> -->
+
+    <div id="usuario" class="container-fluid panel panel-default" style="display:none;">
+        <form class="form-horizontal" id="usuarioForm">
+
+            <div class="form-group panel panel-header" style="text-align:center">
+                <header>
+                    <h2>Datos del Usuario</h2>
+                    <p>Aquí podrás editar los datos de tu usuario: </p>
+                </header>
+            </div>
+            <br/>
+            <div class="form-group panel panel-body" style="text-align:center">
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="ufDeUsuario">Unidad Funcional</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="ufDeUsuario" placeholder="Unidad Funcional"
+                               disabled="true"/>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button id="eliminarReserva" type="button" class="btn btn-danger" data-dismiss="modal" hidden="true">
-				  		<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Eliminar
-					</button>
-                    <button type="button" class="btn btn-link" data-dismiss="modal"> Cancelar
-					</button>
-                    <button id="submitReserva" type="button" class="btn btn-success">
-		        		<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Guardar
-		        	</button>
+
+                <div class="row form-group">
+                    <label class="col-sm-4 control-label" for="piso">Piso</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="piso" placeholder="Piso" disabled="true"/>
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="depto">Departamento</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="depto" placeholder="Departamento" disabled="true"/>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="form-group panel-body">
+                    <span> Si querés cambiar tu contraseña, ingresa una nueva aquí:</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="password">Contrase&ntilde;a</label>
+                    <div class="col-sm-5">
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Contrase&ntilde;a"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="confirmarPassword">Confirmar contrase&ntilde;a</label>
+                    <div class="col-sm-5">
+                        <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword"
+                               placeholder="Confirmá la contrase&ntilde;a"/>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="form-group panel-body">
+                    <span> Opcional: Registrá hasta dos e-mails de contacto los cuales figurarán en tus reservas: </span>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="email">Email</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Email"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="email2">Email alternativo</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="email2" name="email2" placeholder="Email"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-body">
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-5">
+                        <button type="submit" class="btn btn-success form-control" id="submitUsuario">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="nuevaReserva" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="tituloModal"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="datosReserva">
+                    <input type="hidden" id="idReserva"/>
+                    <label>UF: </label>
+                    <input id="ufInput" type="text" class="form-control input-small"
+                           placeholder="Ingrese Unidad Funcional..."></input>
+                    <br/>
+                    <div class="input-group">
+                        <label>Hora de Inicio: </label>
+                        <div class="input-group bootstrap-timepicker timepicker">
+                            <span id="fechaInicio" class="input-group-addon"></span>
+                            <input id="horaInicio" type="text" class="form-control input-small"
+                                   placeholder="Ingrese hora de inicio..."></input>
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="input-group">
+                        <label>Hora de Fin: </label>
+                        <div class="input-group bootstrap-timepicker timepicker">
+                            <span id="fechaFin" class="input-group-addon"></span>
+                            <input id="horaFin" type="text" class="form-control input-small"
+                                   placeholder="Ingrese hora de fin..."></input>
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                        </div>
+                    </div>
+                    <br/>
+                    <label id="datosDeContacto">¿Querés contactar al due&ntilde;o de esta reserva?</label>
+                    <ul>
+                        <li id="emailModalLi"><a id="emailModal" target="_blank"></a></li>
+                        <li id="email2ModalLi"><a id="email2Modal" target="_blank"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="eliminarReserva" type="button" class="btn btn-danger" data-dismiss="modal" hidden="true">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Eliminar
+                </button>
+                <button type="button" class="btn btn-link" data-dismiss="modal"> Cancelar
+                </button>
+                <button id="submitReserva" type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Guardar
+                </button>
             </div>
         </div>
     </div>
-    
-    <div class="modal fade" id="errorsInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	    <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="tituloErrorModal"></h4>
-                </div>
-                <div class="modal-body">
-                   	<h6 class="modal-title" id="cuerpoErrorModal"></h6>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-link" data-dismiss="modal">
-				  		<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cerrar
-					</button>
-                </div>
+</div>
+
+<div class="modal fade" id="errorsInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="tituloErrorModal"></h4>
+            </div>
+            <div class="modal-body">
+                <h6 class="modal-title" id="cuerpoErrorModal"></h6>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link" data-dismiss="modal">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cerrar
+                </button>
             </div>
         </div>
     </div>
-    
+</div>
+
 </body>
 </html>

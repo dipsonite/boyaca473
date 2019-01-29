@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <title>Boyacá 473</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta charset='utf-8'/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></link>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css"
+          integrity="sha384-G0fIWCsCzJIMAVNQPfjH08cyYaUtMwjJwqiRKxxE/rx96Uroj1BtIQ6MLJuheaO9" crossorigin="anonymous"></link>
+</head>
+
+<body>
+
+<div class="container">
+
+    <br> </br>
+    <h1><i class="fas fa-address-book" aria-hidden="true"></i> Administración de Usuarios</h1>
+
+    <div class="row ">
+        <div class="col-md-auto">
+            <form method="GET" th:action="@{/calendar/}">
+                <button type="submit" class="btn btn-outline-success" aria-hidden="true">Volver
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <br></br>
+
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${param.newPass}">
+        <strong>Ok!</strong><span th:text="${' La nueva contraseña del usuario '}"></span><strong
+            th:text="${#httpServletRequest.getParameter('userId')}"></strong><span th:text="${' es: '}"></span><strong
+            th:text="${#httpServletRequest.getParameter('newPass')}"></strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <table class="table table-responsive-md" id="userTable">
+        <thead class="thead-dark">
+        <tr id="id02">
+            <th scope="col">UF <span><i class="fas fa-sort" aria-hidden="true"></i></span></th>
+            <th scope="col">Piso <span><i class="fas fa-sort" aria-hidden="true"></i></span></th>
+            <th scope="col">Departamento <span><i class="fas fa-sort" aria-hidden="true"></i></span></th>
+            <th scope="col">Email <span><i class="fas fa-sort" aria-hidden="true"></i></span></th>
+            <th scope="col">Email 2 <span><i class="fas fa-sort" aria-hidden="true"></i></span></th>
+            <th scope="col">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${userList}">
+            <td>
+                <span th:text="${user.getUsername()}" id="user-userName"></span>
+            </td>
+            <td>
+                <span th:text="${user.getPiso()}" id="user-piso"></span>
+            </td>
+            <td>
+                <span th:text="${user.getDepto()}" id="user-depto"></span>
+            </td>
+            <td >
+                <span th:text="${user.getEmail()}" id="user-email"></span>
+            </td>
+            <td >
+                <span th:text="${user.getEmail2()}" id="user-email2"></span>
+            </td>
+
+            <td sec:authorize="hasRole('ROLE_ADMIN')">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown">Editar</button>
+                    <div class="dropdown-menu">
+                        <div class="col-md-auto" sec:authorize="hasRole('ROLE_ADMIN')">
+                            <button type="button" class="btn btn-outline-danger resetUser" aria-hidden="true" data-toggle="modal"
+                                    data-target="#resetUser">REINICIAR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="resetUser" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" >Editar</h4>
+                <button type="button" class="close" aria-label="Close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="resetForm" action="#" th:action="@{/admin/{id}/reset}" method="POST">
+
+                    <p class="lead text-center">Vas a reiniciar la contraseña del usuario <span id="userToReset" class="text-danger font-weight-bold"></span>.</p>
+                    <p class="font-weight-bold lead text-center">
+                        <span class="text-left">PISO: <span class="text-danger" id="userToResetPiso"></span></span><span class="text-right"> DEPARTAMENTO: <span class="text-danger" id="userToResetDepto"></span></span>
+                    </p>
+
+                    <p class="text-center">
+                        <span >Además, si tiene una reserva activa, se borrará!</span>
+                    </p>
+
+                    <!--<div class="row">-->
+
+                        <!--<span>-->
+                        <!--</span>-->
+
+                    <!--</div>-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Confirmar</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src='../bootstrap-timepicker.min.js'></script>
+<link href='../bootstrap-timepicker.min.css' rel='stylesheet'/>
+<script th:src="@{/cm/js/admin.js}"></script>
+</body>
+</html>

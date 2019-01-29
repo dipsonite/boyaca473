@@ -1,10 +1,10 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
     $("#misForms").children().hide();
     $("#calendar").show();
 
     $.ajaxSetup({
-        beforeSend: function(xhr) {
+        beforeSend: function (xhr) {
             xhr.setRequestHeader('X-CSRF-TOKEN', $("meta[name='_csrf']").attr("content"));
         }
     });
@@ -28,7 +28,7 @@ $(document).ready(function() {
         editable: false,
         nowIndicator: false,
         eventLimit: true,
-        events: function(start, end, timezone, callback) {
+        events: function (start, end, timezone, callback) {
             $.ajax({
                 url: '/reservas/',
                 method: 'POST',
@@ -38,9 +38,9 @@ $(document).ready(function() {
                     min: start,
                     max: end.add(1, 'days')
                 }),
-                success: function(doc) {
+                success: function (doc) {
                     var events = [];
-                    $(doc).each(function() {
+                    $(doc).each(function () {
                         events.push({
                             id: $(this)[0].id,
                             title: $(this)[0].piso + '° ' + $(this)[0].depto,
@@ -57,7 +57,7 @@ $(document).ready(function() {
         },
 
         displayEventTime: false,
-        eventRender: function(event, element) {
+        eventRender: function (event, element) {
 
             element.find('.fc-title')
                 .append("<br/>").append(epochToDate(event.start))
@@ -78,12 +78,12 @@ $(document).ready(function() {
                 element.css('border-color', '#204d74');
             }
         },
-        dayRender: function(date, cell) {
+        dayRender: function (date, cell) {
             if (date.endOf('day') < moment().startOf('day')) {
                 cell.css('background-color', '#f2f2f2');
             }
         },
-        dayClick: function(date, event, view) {
+        dayClick: function (date, event, view) {
             if (date.endOf('day') < moment().startOf('day')) {
                 return false;
             } else {
@@ -102,7 +102,7 @@ $(document).ready(function() {
                 loadModal(null, contextUf, ini, fin, null, null);
             }
         },
-        eventClick: function(event, jsEvent, view) {
+        eventClick: function (event, jsEvent, view) {
             if (moment(event.start) < moment(today)) {
                 return;
             } else {
@@ -125,7 +125,7 @@ $(document).ready(function() {
         showMeridian: false
     }));
 
-    $('#horaFin').timepicker().on('changeTime.timepicker', function(e) {
+    $('#horaFin').timepicker().on('changeTime.timepicker', function (e) {
         var fechaReserva = $('#fechaInicio').text();
         var startTime = moment($('#horaInicio').val(), "HH:mm");
         var endTime = moment(e.time.value, "HH:mm");
@@ -138,7 +138,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#submitReserva').click(function() {
+    $('#submitReserva').click(function () {
 
         var idRes = $('#idReserva').val();
         var uf = $('#ufInput').val();
@@ -181,14 +181,14 @@ $(document).ready(function() {
             contentType: "application/json",
             dataType: 'json',
             data: JSON.stringify(eventData),
-            error: function(err) {
+            error: function (err) {
                 $('#errorsInfo').removeClass('alert-danger alert-success');
                 $('#errorsInfo').addClass('alert alert-danger alert-dismissible');
                 $('#tituloErrorModal').html('<strong>Ups!</strong>');
                 $('#cuerpoErrorModal').text(err.responseJSON.message);
                 $('#errorsInfo').modal('show');
             },
-            success: function(data) {
+            success: function (data) {
                 eventData = {
                     id: data.id,
                     title: data.uf,
@@ -205,17 +205,17 @@ $(document).ready(function() {
         $('#nuevaReserva').modal('hide');
     });
 
-    $('#eliminarReserva').click(function() {
+    $('#eliminarReserva').click(function () {
 
         $.ajax({
             url: '/reservas/eliminar/' + $('#idReserva').val(),
             type: 'DELETE',
-            success: function(data) {
+            success: function (data) {
                 $('#calendar').fullCalendar('refetchEvents');
                 $('#info').addClass('alert alert-success alert-dismissible');
                 $('#info').html('<strong>Buenísimo!</strong> Tu reserva se ha eliminado correctamente.');
             },
-            error: function() {
+            error: function () {
                 $('#info').addClass('alert alert-danger alert-dismissible');
                 $('#info').html('<strong>ERROR!</strong> Tu reserva no se ha podido eliminar.');
             }
@@ -299,11 +299,15 @@ $(document).ready(function() {
         return finalDate;
     }
 
-    $('#navbar').on('click', function() {
+    $('#navbar').on('click', function () {
 
         if (event.target.classList[0] != "dropdown-toggle") {
 
-            if (event.target.href != undefined) {
+            if (event.target.href === undefined) {
+
+            } else if (event.target.href.indexOf('#') == -1) {
+                window.location.assign(event.target.href);
+            } else {
                 $("#misForms").children().hide();
 
                 var id = event.target.href.split('#')[1];
@@ -315,14 +319,14 @@ $(document).ready(function() {
                     $.ajax({
                         url: '/usuario/' + contextUf,
                         type: 'GET',
-                        error: function(err) {
+                        error: function (err) {
                             $('#errorsInfo').removeClass('alert-danger alert-success');
                             $('#errorsInfo').addClass('alert alert-danger alert-dismissible');
                             $('#tituloErrorModal').html('<strong>Ups!</strong>');
                             $('#cuerpoErrorModal').text(err.responseJSON.message);
                             $('#errorsInfo').modal('show');
                         },
-                        success: function(data) {
+                        success: function (data) {
                             $('#ufDeUsuario').val(data.uf);
                             $('#piso').val(data.piso);
                             $('#depto').val(data.depto);
@@ -335,7 +339,7 @@ $(document).ready(function() {
         }
     });
 
-    $("#usuarioForm").submit(function() {
+    $("#usuarioForm").submit(function () {
 
         var errors = $("#usuarioForm").find('div.has-error');
         if (errors.length != 0 || $('#password').val() != $('#confirmarPassword').val()) {
@@ -360,14 +364,14 @@ $(document).ready(function() {
             contentType: "application/json",
             dataType: 'json',
             data: JSON.stringify(data),
-            error: function(err) {
+            error: function (err) {
                 $('#errorsInfo').removeClass('alert-danger alert-success');
                 $('#errorsInfo').addClass('alert alert-danger alert-dismissible');
                 $('#tituloErrorModal').html('<strong>Ups!</strong>');
                 $('#cuerpoErrorModal').text(err.responseJSON.message);
                 $('#errorsInfo').modal('show');
             },
-            success: function(data) {
+            success: function (data) {
                 $('#errorsInfo').removeClass('alert-danger alert-success');
                 $('#errorsInfo').addClass('alert alert-success alert-dismissible');
                 $('#tituloErrorModal').html('<strong>Perfecto!!</strong>');
@@ -387,7 +391,7 @@ $(document).ready(function() {
                 minlength: 4
             },
             confirmarPassword: {
-                required: function() {
+                required: function () {
                     return $('#password').val() != '' ? true : false;
                 },
                 minlength: 4,
@@ -403,12 +407,12 @@ $(document).ready(function() {
             },
         },
         messages: {
-        	confirmarPassword: {
-        		equalTo: "La contraseña no coincide con la ingresada anteriormente."
-        	}
+            confirmarPassword: {
+                equalTo: "La contraseña no coincide con la ingresada anteriormente."
+            }
         },
         errorElement: "em",
-        errorPlacement: function(error, element) {
+        errorPlacement: function (error, element) {
             // Add the `help-block` class to the error element
             error.addClass("help-block");
 
@@ -423,17 +427,17 @@ $(document).ready(function() {
                 $("<span class='glyphicon glyphicon-remove form-control-feedback'></span>").insertAfter(element);
             }
         },
-        success: function(label, element) {
+        success: function (label, element) {
             // Add the span element, if doesn't exists, and apply the icon classes to it.
             if (!$(element).next("span")[0]) {
                 $("<span class='glyphicon glyphicon-ok form-control-feedback'></span>").insertAfter($(element));
             }
         },
-        highlight: function(element, errorClass, validClass) {
+        highlight: function (element, errorClass, validClass) {
             $(element).parents(".col-sm-5").addClass("has-error").removeClass("has-success");
             $(element).next("span").addClass("glyphicon-remove").removeClass("glyphicon-ok");
         },
-        unhighlight: function(element, errorClass, validClass) {
+        unhighlight: function (element, errorClass, validClass) {
             $(element).parents(".col-sm-5").addClass("has-success").removeClass("has-error");
             $(element).next("span").addClass("glyphicon-ok").removeClass("glyphicon-remove");
         }
