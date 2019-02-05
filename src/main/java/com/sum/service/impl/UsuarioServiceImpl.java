@@ -1,5 +1,6 @@
 package com.sum.service.impl;
 
+import com.sum.dao.ReservaDAO;
 import com.sum.dao.UsuarioDAO;
 import com.sum.dao.criteria.ReservaCriteria;
 import com.sum.domain.Reserva;
@@ -26,6 +27,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private ReservaService reservaService;
+
+    @Autowired
+    private ReservaDAO reservaDAO;
 
     @Autowired
     public UsuarioServiceImpl(UsuarioDAO dao) {
@@ -72,8 +76,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         ReservaCriteria criteria = new ReservaCriteria();
         criteria.setUf(Integer.valueOf(uf));
-        criteria.setMin(Timestamp.valueOf(LocalDateTime.now()));
-        List<Reserva> reservas = reservaService.buscarReservasConCriteria(criteria);
+        criteria.setMax(new Timestamp(System.currentTimeMillis()));
+        List<Reserva> reservas = reservaDAO.getReservasParaUfYFecha(criteria);
 
         for (Reserva reserva: reservas) {
             reservaService.eliminarReserva(reserva.getId());
